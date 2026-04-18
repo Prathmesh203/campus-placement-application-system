@@ -219,6 +219,18 @@ export default function CreateDrive() {
                         onChange={handleChange}
                     />
                 </div>
+                <div className="space-y-2">
+                    <Label htmlFor="duration">Test Duration (Minutes)</Label>
+                    <Input
+                        id="duration"
+                        name="duration"
+                        type="number"
+                        min="1"
+                        value={formData.duration}
+                        onChange={handleChange}
+                        required
+                    />
+                </div>
             </div>
           </CardContent>
         </Card>

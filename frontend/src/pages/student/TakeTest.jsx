@@ -81,10 +81,12 @@ export default function TakeTest() {
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900 mb-2">{drive.title} - Screening Test</h1>
         <div className="flex items-center gap-4 text-gray-500 text-sm">
-          <span className="flex items-center gap-1">
-            <Clock className="w-4 h-4" />
-            Duration: No limit
-          </span>
+          {timeLeft !== null && (
+            <span className={`flex items-center gap-1 font-bold text-lg ${timeLeft < 300 ? 'text-red-600 animate-pulse' : 'text-blue-600'}`}>
+              <Clock className="w-5 h-5" />
+              Time Left: {formatTime(timeLeft)}
+            </span>
+          )}
           <span className="flex items-center gap-1">
             <FileText className="w-4 h-4" />
             {drive.questions?.length || 0} Questions

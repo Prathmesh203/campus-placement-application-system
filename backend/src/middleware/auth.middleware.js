@@ -14,7 +14,7 @@ const protect = asyncHandler(async (req, res, next) => {
         req.user = {
           _id: '000000000000000000000000',
           name: 'System Administrator',
-          email: 'admin@campushire.com',
+          email: 'admin@skillgate.com',
           role: 'admin',
           status: 'approved'
         };

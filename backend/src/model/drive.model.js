@@ -20,6 +20,7 @@ const driveSchema = mongoose.Schema({
         type: { type: String, enum: ['text', 'mcq'], default: 'text' },
         marks: { type: Number, default: 10 }
     }],
+    duration: { type: Number, default: 60 }, // Test duration in minutes
     status: { type: String, enum: ['active', 'closed'], default: 'active' }
 }, { timestamps: true });
 

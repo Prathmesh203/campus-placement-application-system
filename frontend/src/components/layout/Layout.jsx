@@ -22,7 +22,7 @@ export function Layout({ children }) {
         <div className="container flex h-16 items-center justify-between px-4 md:px-8">
           <Link to="/" className="flex items-center gap-2 font-bold text-xl text-blue-600">
             <GraduationCap className="h-6 w-6" />
-            <span>CampusHire</span>
+            <span>SkillGate</span>
           </Link>
           
           <nav className="flex items-center gap-4">
@@ -113,7 +113,7 @@ export function Layout({ children }) {
 
       <footer className="border-t bg-white py-6 md:py-8">
         <div className="container px-4 md:px-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-500">
-          <p>© 2026 CampusHire. All rights reserved.</p>
+          <p>© 2026 SkillGate. All rights reserved.</p>
           <div className="flex gap-4">
             <a href="#" className="hover:text-blue-600">Privacy Policy</a>
             <a href="#" className="hover:text-blue-600">Terms of Service</a>

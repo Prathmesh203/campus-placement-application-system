@@ -6,7 +6,7 @@ const Application = require('../model/application.model');
 // @route   POST /api/drives
 // @access  Private (Company)
 const createDrive = asyncHandler(async (req, res) => {
-    const { title, description, batchYear, cgpaCutoff, requiredSkills, salary, deadline, testDate, questions } = req.body;
+    const { title, description, batchYear, cgpaCutoff, skills, salary, deadline, testDate, questions } = req.body;
 
     if (!title || !description || !batchYear || !cgpaCutoff || !salary || !deadline) {
         res.status(400);
@@ -24,7 +24,8 @@ const createDrive = asyncHandler(async (req, res) => {
         salary,
         deadline,
         testDate,
-        questions: questions || []
+        questions: questions || [],
+        duration: duration || 60
     });
 
     res.status(201).json(drive);

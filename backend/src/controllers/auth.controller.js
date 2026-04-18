@@ -39,12 +39,12 @@ const loginUser = asyncHandler(async (req, res) => {
      const { email, password } = req.body;
 
      // Hardcoded Admin Check
-     if (email === 'admin@campushire.com' && password === 'admin123') {
+     if (email === 'admin@skillgate.com' && password === 'admin123') {
           // Create a temporary admin user instance to generate token
           const adminUser = new User({
                _id: '000000000000000000000000', // Mock Object ID
                name: 'System Administrator',
-               email: 'admin@campushire.com',
+               email: 'admin@skillgate.com',
                role: 'admin',
                status: 'approved'
           });
