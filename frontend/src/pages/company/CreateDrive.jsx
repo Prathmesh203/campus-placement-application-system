@@ -14,8 +14,9 @@ export default function CreateDrive() {
     title: '',
     description: '',
     batchYear: '',
+    batchYear: '',
     cgpaCutoff: '',
-    skills: '',
+    requiredSkills: [{ name: '', level: 'Beginner' }],
     salary: '',
     deadline: '',
     testDate: ''
@@ -28,6 +29,20 @@ export default function CreateDrive() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSkillChange = (index, field, value) => {
+      const newSkills = [...formData.requiredSkills];
+      newSkills[index] = { ...newSkills[index], [field]: value };
+      setFormData(prev => ({ ...prev, requiredSkills: newSkills }));
+  };
+
+  const addSkill = () => {
+      setFormData(prev => ({ ...prev, requiredSkills: [...prev.requiredSkills, { name: '', level: 'Beginner' }] }));
+  };
+
+  const removeSkill = (index) => {
+      setFormData(prev => ({ ...prev, requiredSkills: prev.requiredSkills.filter((_, i) => i !== index) }));
   };
 
   const handleQuestionChange = (index, field, value) => {
@@ -52,9 +67,11 @@ export default function CreateDrive() {
     try {
       // Filter out empty questions
       const validQuestions = questions.filter(q => q.question.trim() !== '');
+      const validSkills = formData.requiredSkills.filter(s => s.name.trim() !== '');
       
       await driveService.createDrive({
         ...formData,
+        requiredSkills: validSkills,
         questions: validQuestions
       });
       alert("Drive created successfully!");
@@ -140,16 +157,46 @@ export default function CreateDrive() {
                         placeholder="10-12 LPA"
                     />
                 </div>
-                <div className="space-y-2">
-                    <Label htmlFor="skills">Required Skills (Comma separated)</Label>
-                    <Input
-                        id="skills"
-                        name="skills"
-                        value={formData.skills}
-                        onChange={handleChange}
-                        required
-                        placeholder="Java, React, SQL"
-                    />
+                <div className="md:col-span-2 space-y-4 pt-4 border-t">
+                    <div className="flex justify-between items-center">
+                        <Label>Required Skills</Label>
+                        <Button type="button" onClick={addSkill} size="sm" variant="outline">
+                            + Add Skill
+                        </Button>
+                    </div>
+                    {formData.requiredSkills.map((skill, index) => (
+                        <div key={index} className="flex gap-4 items-center">
+                            <div className="flex-1">
+                                <Input 
+                                    placeholder="Skill Name (e.g. React)"
+                                    value={skill.name}
+                                    onChange={(e) => handleSkillChange(index, 'name', e.target.value)}
+                                    required
+                                />
+                            </div>
+                            <div className="w-1/3">
+                                <select
+                                    value={skill.level}
+                                    onChange={(e) => handleSkillChange(index, 'level', e.target.value)}
+                                    className="w-full px-3 py-2 border rounded border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                >
+                                    <option value="Beginner">Beginner</option>
+                                    <option value="Intermediate">Intermediate</option>
+                                    <option value="Advanced">Advanced</option>
+                                </select>
+                            </div>
+                            <button 
+                                type="button" 
+                                onClick={() => removeSkill(index)}
+                                className="text-red-500 hover:text-red-700"
+                            >
+                                <Trash2 className="w-5 h-5" />
+                            </button>
+                        </div>
+                    ))}
+                    {formData.requiredSkills.length === 0 && (
+                        <p className="text-slate-500 text-sm">No skills added yet.</p>
+                    )}
                 </div>
                  <div className="space-y-2">
                     <Label htmlFor="deadline">Application Deadline</Label>

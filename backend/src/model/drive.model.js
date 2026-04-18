@@ -7,7 +7,10 @@ const driveSchema = mongoose.Schema({
     description: { type: String, required: true },
     batchYear: { type: Number, required: true },
     cgpaCutoff: { type: Number, required: true },
-    skills: { type: [String], required: true }, // Required skills tags
+    requiredSkills: [{
+        name: { type: String, required: true },
+        level: { type: String, enum: ['Beginner', 'Intermediate', 'Advanced'], default: 'Beginner' }
+    }], // Required skills tags
     salary: { type: String, required: true },
     deadline: { type: Date, required: true },
     testDate: { type: Date },

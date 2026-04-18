@@ -142,4 +142,50 @@ const submitTest = asyncHandler(async (req, res) => {
     res.status(201).json(application);
 });
 
-module.exports = { applyToDrive, getStudentApplications, getDriveApplications, updateApplicationStatus, getCompanyStats, submitTest };
+const { compareCandidateWithJob } = require('../services/geminiService');
+
+// @desc    Get recommended candidates for a drive
+// @route   GET /api/applications/drive/:driveId/recommended
+// @access  Private (Company)
+const getRecommendedCandidates = asyncHandler(async (req, res) => {
+    const driveId = req.params.driveId;
+    const drive = await Drive.findById(driveId);
+    if (!drive) {
+        res.status(404);
+        throw new Error('Drive not found');
+    }
+
+    // Fetch all applicants for this drive
+    const applications = await Application.find({ driveId }).populate('studentId', 'name email skills');
+
+    // Filter to those who haven't been scored yet
+    const unscored = applications.filter(app => !app.matchScore && !app.explanation);
+    
+    // Pick top unscored to limit API calls (e.g. 5)
+    const toScore = unscored.slice(0, 5);
+
+    for (const app of toScore) {
+        const studentData = app.studentId.skills || [];
+        const jobData = drive.requiredSkills || [];
+
+        // Call Gemini (geminiService already handles errors and returns fallback JSON on failure)
+        const result = await compareCandidateWithJob(studentData, jobData);
+        
+        // Save to DB
+        app.matchScore = result.match_percentage;
+        app.recommendation = result.recommendation;
+        app.explanation = result.explanation;
+        app.missingSkills = result.missing_skills || [];
+        app.strengths = result.strengths || [];
+        await app.save();
+    }
+
+    // Return all applicants sorted by matchScore
+    const allScored = await Application.find({ driveId, matchScore: { $gt: 0 } })
+        .populate('studentId', 'name email resume profileCompleted skills')
+        .sort({ matchScore: -1 });
+
+    res.json(allScored);
+});
+
+module.exports = { applyToDrive, getStudentApplications, getDriveApplications, updateApplicationStatus, getCompanyStats, submitTest, getRecommendedCandidates };

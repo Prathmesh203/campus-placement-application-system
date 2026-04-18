@@ -16,7 +16,7 @@ export default function StudentProfile() {
     branch: user?.branch || '',
     cgpa: user?.cgpa || '',
     graduationYear: user?.graduationYear || '',
-    skills: user?.skills ? user.skills.join(', ') : '',
+    skills: user?.skills || [],
     resume: user?.resume || '',
   });
 
@@ -25,11 +25,27 @@ export default function StudentProfile() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleSkillChange = (index, field, value) => {
+      const newSkills = [...formData.skills];
+      newSkills[index] = { ...newSkills[index], [field]: value };
+      setFormData(prev => ({ ...prev, skills: newSkills }));
+  };
+
+  const addSkill = () => {
+      setFormData(prev => ({ ...prev, skills: [...prev.skills, { name: '', level: 'Beginner' }] }));
+  };
+
+  const removeSkill = (index) => {
+      setFormData(prev => ({ ...prev, skills: prev.skills.filter((_, i) => i !== index) }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await updateUser(formData);
+      // Filter out empty skills
+      const validSkills = formData.skills.filter(s => s.name.trim() !== '');
+      await updateUser({ ...formData, skills: validSkills });
       setIsEditing(false);
       alert("Profile updated successfully!");
     } catch (error) {
@@ -141,24 +157,59 @@ export default function StudentProfile() {
             </div>
 
             <div className="space-y-2 pt-4 border-t">
-              <h3 className="font-medium text-lg">Skills</h3>
-              <div className="space-y-2">
-                <Label htmlFor="skills">Skills (Comma separated)</Label>
-                <Input
-                  id="skills"
-                  name="skills"
-                  value={formData.skills}
-                  onChange={handleChange}
-                  disabled={!isEditing}
-                  placeholder="React, Node.js, Python..."
-                />
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="font-medium text-lg">Skills</h3>
+                {isEditing && (
+                    <Button type="button" onClick={addSkill} size="sm" variant="outline">
+                        + Add Skill
+                    </Button>
+                )}
+              </div>
+              <div className="space-y-4">
+                {formData.skills.map((skill, index) => (
+                    <div key={index} className="flex gap-4 items-center">
+                        <div className="flex-1">
+                            <Input 
+                                placeholder="Skill Name (e.g. React)"
+                                value={skill.name}
+                                onChange={(e) => handleSkillChange(index, 'name', e.target.value)}
+                                disabled={!isEditing}
+                                required
+                            />
+                        </div>
+                        <div className="w-1/3">
+                            <select
+                                value={skill.level}
+                                onChange={(e) => handleSkillChange(index, 'level', e.target.value)}
+                                disabled={!isEditing}
+                                className="w-full px-3 py-2 border rounded border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            >
+                                <option value="Beginner">Beginner</option>
+                                <option value="Intermediate">Intermediate</option>
+                                <option value="Advanced">Advanced</option>
+                            </select>
+                        </div>
+                        {isEditing && (
+                            <button 
+                                type="button" 
+                                onClick={() => removeSkill(index)}
+                                className="text-red-500 hover:text-red-700"
+                            >
+                                Remove
+                            </button>
+                        )}
+                    </div>
+                ))}
+                {formData.skills.length === 0 && (
+                    <p className="text-slate-500 text-sm">No skills added yet.</p>
+                )}
               </div>
             </div>
           </form>
         </CardContent>
         {isEditing && (
           <CardFooter className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setIsEditing(false)} disabled={isLoading}>Cancel</Button>
+            <Button variant="outline" type="button" onClick={() => setIsEditing(false)} disabled={isLoading}>Cancel</Button>
             <Button type="submit" form="profile-form" isLoading={isLoading}>
               <Save className="h-4 w-4 mr-2" /> Save Changes
             </Button>

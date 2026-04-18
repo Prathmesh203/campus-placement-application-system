@@ -6,14 +6,16 @@ const userSchema = mongoose.Schema({
      email: { type: String, required: true, unique: true },
      password: { type: String, required: true },
      role: { type: String, enum: ['student', 'company', 'admin'], default: 'student' },
-     status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' }, // Admin approval status
      
      // Student Specific Fields
      collegeId: { type: String },
      branch: { type: String },
      graduationYear: { type: Number },
      cgpa: { type: Number },
-     skills: { type: [String], default: [] },
+     skills: [{
+          name: { type: String, required: true },
+          level: { type: String, enum: ['Beginner', 'Intermediate', 'Advanced'], default: 'Beginner' }
+     }],
      resume: { type: String }, // URL or path
      profileCompleted: { type: Boolean, default: false },
 

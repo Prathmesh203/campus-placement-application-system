@@ -4,6 +4,7 @@ const authRoutes = require('./src/routes/auth.routes');
 const driveRoutes = require('./src/routes/drive.routes');
 const applicationRoutes = require('./src/routes/application.routes');
 const adminRoutes = require('./src/routes/admin.routes');
+const studentRoutes = require('./src/routes/student.routes');
 const connectDb = require("./src/db/db");
 const app = express();
 
@@ -18,6 +19,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/drives', driveRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/student', studentRoutes);
 
 connectDb().then(() => {
      app.listen(3000, () => {

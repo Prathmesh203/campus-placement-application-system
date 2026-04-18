@@ -33,6 +33,18 @@ const DriveApplicants = () => {
     }
   };
 
+  const handleAIAnalysis = async () => {
+    setLoading(true);
+    try {
+      const response = await applicationService.getRecommendedCandidates(driveId);
+      setApplicants(response.data);
+    } catch (err) {
+      alert('Failed to analyze candidates');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleStatusUpdate = async (applicationId, newStatus) => {
     try {
       await applicationService.updateStatus(applicationId, newStatus);
@@ -104,7 +116,15 @@ const DriveApplicants = () => {
         </button>
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Manage Applicants</h1>
-          <p className="text-gray-600">Review and track candidate applications</p>
+          <p className="text-slate-600">Review and track candidate applications</p>
+        </div>
+        <div className="ml-auto">
+          <button 
+             onClick={handleAIAnalysis}
+             className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium shadow-sm transition-colors flex items-center gap-2"
+          >
+             <Award className="w-5 h-5" /> AI Match Analysis
+          </button>
         </div>
       </div>
 
@@ -150,6 +170,7 @@ const DriveApplicants = () => {
             <thead className="bg-gray-50 border-b border-gray-100">
               <tr>
                 <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase">Candidate</th>
+                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase">Match Score</th>
                 <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase">Academic Info</th>
                 <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase">Applied Date</th>
                 <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase">Status</th>
@@ -169,6 +190,29 @@ const DriveApplicants = () => {
                         <div className="text-sm text-gray-500">{app.studentId?.email}</div>
                       </div>
                     </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    {app.matchScore ? (
+                      <div className="w-32">
+                        <div className="flex items-center justify-between text-sm mb-1">
+                          <span className="font-semibold text-gray-700">{app.matchScore}%</span>
+                          <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold
+                            ${app.recommendation === 'High Fit' ? 'bg-green-100 text-green-700' : 
+                              app.recommendation === 'Medium Fit' ? 'bg-yellow-100 text-yellow-700' : 
+                              'bg-red-100 text-red-700'}`}>
+                            {app.recommendation}
+                          </span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-1.5">
+                          <div 
+                            className={`h-1.5 rounded-full ${app.matchScore >= 80 ? 'bg-green-500' : app.matchScore >= 50 ? 'bg-yellow-500' : 'bg-red-500'}`} 
+                            style={{ width: `${app.matchScore}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    ) : (
+                      <span className="text-xs text-gray-400 italic">Unscored</span>
+                    )}
                   </td>
                   <td className="px-6 py-4">
                     <div className="text-sm text-gray-900">{app.studentId?.branch}</div>
@@ -254,6 +298,37 @@ const DriveApplicants = () => {
             </div>
             
             <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                {selectedApp.matchScore > 0 && (
+                  <div className="bg-indigo-50 border border-indigo-100 p-5 rounded-lg mb-6">
+                    <h3 className="font-bold text-indigo-900 flex items-center gap-2 mb-3">
+                      <Award className="w-5 h-5 text-indigo-600" />
+                      AI Recommendation: {selectedApp.recommendation} ({selectedApp.matchScore}%)
+                    </h3>
+                    <p className="text-gray-700 mb-4">{selectedApp.explanation}</p>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <h4 className="text-xs font-bold text-green-700 uppercase mb-2">Strengths</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {selectedApp.strengths?.map((s, i) => (
+                            <span key={i} className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded border border-green-200">{s}</span>
+                          ))}
+                          {(!selectedApp.strengths || selectedApp.strengths.length === 0) && <span className="text-xs text-gray-400">None identified</span>}
+                        </div>
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-bold text-red-700 uppercase mb-2">Missing Skills</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {selectedApp.missingSkills?.map((s, i) => (
+                            <span key={i} className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded border border-red-200">{s}</span>
+                          ))}
+                          {(!selectedApp.missingSkills || selectedApp.missingSkills.length === 0) && <span className="text-xs text-gray-400">None identified</span>}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {selectedApp.testAnswers && selectedApp.testAnswers.length > 0 ? (
                     <div className="space-y-6">
                         <h3 className="font-semibold text-lg border-b pb-2">Test Answers</h3>

@@ -53,8 +53,13 @@ export const applicationService = {
   submitTest: (data) => api.post('/applications/submit-test', data), // New: Submit test and create application
   getMyApplications: () => api.get('/applications/my'),
   getDriveApplications: (driveId) => api.get(`/applications/drive/${driveId}`),
+  getRecommendedCandidates: (driveId) => api.get(`/applications/drive/${driveId}/recommended`), // Gemini Recommendation
   updateStatus: (appId, status, testScore) => api.put(`/applications/${appId}/status`, { status, testScore }),
   getStats: () => api.get('/applications/stats'),
+};
+
+export const studentService = {
+  getRecommendedJobs: () => api.get('/student/recommended-jobs'),
 };
 
 export const adminService = {

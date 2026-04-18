@@ -14,18 +14,11 @@ const registerUser = asyncHandler(async (req, res) => {
           res.status(400).json({ message: "User already exists" });
      }
 
-     // Initial status logic
-     let status = 'pending';
-     // For demo purposes, auto-approve students if needed, but requirements say otherwise.
-     // Sticking to schema default 'pending' unless admin.
-     if (role === 'admin') status = 'approved';
-
      const user = await User.create({
           name,
           email,
           password, // Stored as plain text
-          role: role || 'student',
-          status
+          role: role || 'student'
      });
 
      if (user) {
@@ -34,7 +27,6 @@ const registerUser = asyncHandler(async (req, res) => {
                name: user.name,
                email: user.email,
                role: user.role,
-               status: user.status,
                token: user.generateAuthToken()
           });
      } else {
@@ -116,7 +108,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
             user.branch = req.body.branch || user.branch;
             user.graduationYear = req.body.graduationYear || user.graduationYear;
             user.cgpa = req.body.cgpa || user.cgpa;
-            user.skills = req.body.skills ? req.body.skills.split(',').map(s=>s.trim()) : user.skills;
+            user.skills = req.body.skills ? (typeof req.body.skills === 'string' ? JSON.parse(req.body.skills) : req.body.skills) : user.skills;
             user.resume = req.body.resume || user.resume;
             user.profileCompleted = true; // Mark complete on update
         }

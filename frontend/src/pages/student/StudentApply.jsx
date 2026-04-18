@@ -7,43 +7,22 @@ import { applicationService } from '../../services/api';
 
 export default function StudentApply() {
   const { user } = useAuth();
-  const isApproved = user?.status === 'approved';
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (isApproved) {
-      const fetchApps = async () => {
-        try {
-          const res = await applicationService.getMyApplications();
-          setApplications(res.data);
-        } catch (error) {
-          console.error("Failed to fetch applications", error);
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchApps();
-    }
-  }, [isApproved]);
-
-  if (!isApproved) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[50vh] text-center space-y-6">
-        <div className="bg-yellow-50 p-6 rounded-full">
-          <AlertCircle className="h-16 w-16 text-yellow-600" />
-        </div>
-        <div>
-          <h2 className="text-2xl font-bold text-slate-900">Awaiting Admin Approval</h2>
-          <p className="text-slate-500 mt-2 max-w-md mx-auto">
-            You cannot apply for jobs until your profile has been verified and approved by the administration team.
-            Please ensure your profile details are complete.
-          </p>
-        </div>
-        <Button onClick={() => window.location.href = '/student/profile'}>Complete Profile</Button>
-      </div>
-    );
-  }
+    const fetchApps = async () => {
+      try {
+        const res = await applicationService.getMyApplications();
+        setApplications(res.data);
+      } catch (error) {
+        console.error("Failed to fetch applications", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchApps();
+  }, []);
 
   if (loading) return <div className="text-center py-8">Loading applications...</div>;
 

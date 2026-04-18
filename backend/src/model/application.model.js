@@ -11,6 +11,11 @@ const applicationSchema = mongoose.Schema({
         marksObtained: { type: Number, default: 0 } // For manual grading
     }],
     testScore: { type: Number, default: 0 },
+    matchScore: { type: Number, default: 0 },
+    recommendation: { type: String, enum: ['High Fit', 'Medium Fit', 'Low Fit'] },
+    explanation: { type: String },
+    missingSkills: { type: [String] },
+    strengths: { type: [String] },
     appliedAt: { type: Date, default: Date.now }
 }, { timestamps: true });
 
